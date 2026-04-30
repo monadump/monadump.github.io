@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Diary</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#0a0a0a;
+  --card:#1c1c1e;
+  --card-hover:#252528;
+  --accent:#4da3ff;
+  --accent-glow:rgba(77,163,255,0.2);
+  --text:#e9ecff;
+  --text-dim:#8e8e93;
+  --border:#2c2c2e;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+#particles-canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+.orb{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(120px);
+  opacity:0.08;
+  pointer-events:none;
+  z-index:0;
+}
+.orb-1{
+  width:500px;height:500px;
+  background:var(--accent);
+  top:-150px;right:-100px;
+  animation:float 12s ease-in-out infinite;
+}
+.orb-2{
+  width:400px;height:400px;
+  background:#6b4dff;
+  bottom:-100px;left:-100px;
+  animation:float 14s ease-in-out infinite reverse;
+}
+@keyframes float{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(30px,-30px) scale(1.08)}
+}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+.header{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  background:rgba(10,10,10,0.85);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  animation:slideDown 0.6s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes slideDown{
+  from{transform:translateY(-100%);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+.logo{
+  font-size:1.3rem;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  transition:transform 0.3s;
+}
+.logo:hover{transform:scale(1.02)}
+.logo .logo-icon{
+  width:34px;height:34px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#2d7acc);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 16px var(--accent-glow);
+}
+.logo .logo-icon span{font-size:20px;color:#fff}
+.logo-text{
+  background:linear-gradient(135deg,#fff 30%,var(--accent) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.search-wrap{
+  position:relative;
+  width:220px;
+}
+.search-wrap input{
+  width:100%;
+  padding:9px 12px 9px 38px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(28,28,30,0.8);
+  color:var(--text);
+  font-size:0.85rem;
+  font-family:inherit;
+  outline:none;
+  transition:all 0.3s;
+}
+.search-wrap input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+}
+.search-wrap input::placeholder{color:var(--text-dim)}
+.search-wrap .search-icon{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--text-dim);
+  font-size:18px;
+  pointer-events:none;
+}
+
+.icon-btn{
+  width:38px;height:38px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(28,28,30,0.8);
+  color:var(--text-dim);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.3s;
+}
+.icon-btn:hover{
+  color:var(--accent);
+  border-color:var(--accent);
+  background:rgba(77,163,255,0.1);
+}
+.icon-btn span{font-size:20px}
+
+.hero{
+  position:relative;
+  z-index:1;
+  padding:140px 20px 40px;
+  text-align:center;
+  max-width:800px;
+  margin:0 auto;
+}
+.hero h1{
+  font-size:2.8rem;
+  font-weight:800;
+  line-height:1.15;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,#fff 0%,var(--accent) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:fadeInUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s both;
+}
+.hero .tagline{
+  font-size:1.05rem;
+  color:var(--text-dim);
+  margin-bottom:32px;
+  animation:fadeInUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.35s both;
+}
+@keyframes fadeInUp{
+  from{transform:translateY(30px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+.controls{
+  position:relative;
+  z-index:1;
+  max-width:800px;
+  margin:0 auto 24px;
+  padding:0 20px;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  animation:fadeInUp 0.7s ease-out 0.5s both;
+}
+
+.sort-wrap{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.sort-wrap label{
+  font-size:0.82rem;
+  color:var(--text-dim);
+}
+.sort-wrap select{
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(28,28,30,0.8);
+  color:var(--text);
+  font-family:inherit;
+  font-size:0.82rem;
+  cursor:pointer;
+  outline:none;
+  transition:all 0.3s;
+}
+.sort-wrap select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+}
+
+.cards-grid{
+  position:relative;
+  z-index:1;
+  max-width:800px;
+  margin:0 auto;
+  padding:0 20px 80px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:28px;
+  display:flex;
+  align-items:flex-start;
+  gap:18px;
+  text-decoration:none;
+  color:var(--text);
+  cursor:pointer;
+  transition:all 0.4s cubic-bezier(0.22,1,0.36,1);
+  position:relative;
+  overflow:hidden;
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{
+  from{transform:translateY(20px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+.card::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),#6bb8ff);
+  transform:scaleX(0);
+  transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  border-radius:18px 18px 0 0;
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(77,163,255,0.4);
+  box-shadow:0 16px 40px rgba(77,163,255,0.1),0 0 0 1px rgba(77,163,255,0.1);
+}
+.card:hover::before{transform:scaleX(1)}
+
+.card-icon-wrap{
+  width:48px;height:48px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),#2d7acc);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 6px 20px var(--accent-glow);
+  transition:transform 0.3s;
+}
+.card:hover .card-icon-wrap{transform:scale(1.08) rotate(-3deg)}
+.card-icon-wrap span{font-size:24px;color:#fff}
+
+.card-body{flex:1;min-width:0}
+.card h2{
+  font-size:1.15rem;
+  font-weight:700;
+  color:var(--accent);
+  margin-bottom:6px;
+}
+.card p{
+  font-size:0.9rem;
+  color:var(--text-dim);
+  line-height:1.55;
+}
+
+.card-meta-row{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+}
+.card-meta-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:0.78rem;
+  color:var(--text-dim);
+}
+.card-meta-item span{font-size:15px;opacity:0.6}
+
+.card-arrow{
+  margin-left:auto;
+  align-self:center;
+  opacity:0;
+  transform:translateX(-8px);
+  transition:all 0.3s;
+  color:var(--accent);
+}
+.card:hover .card-arrow{
+  opacity:1;
+  transform:translateX(0);
+}
+
+.no-results{
+  text-align:center;
+  padding:60px 20px;
+  color:var(--text-dim);
+}
+.no-results span{font-size:3rem;opacity:0.3;display:block;margin-bottom:12px}
+.no-results h3{font-size:1.2rem;margin-bottom:6px;color:var(--text)}
+.no-results p{font-size:0.9rem}
+
+.footer{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:28px 20px;
+  border-top:1px solid var(--border);
+  color:var(--text-dim);
+  font-size:0.82rem;
+}
+.footer a{color:var(--accent);text-decoration:none;transition:opacity 0.3s}
+.footer a:hover{opacity:0.8}
+
+.footer-socials{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+.footer-socials a{
+  width:42px;height:42px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(28,28,30,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.3s;
+  text-decoration:none;
+}
+.footer-socials a:hover{
+  border-color:var(--accent);
+  background:rgba(77,163,255,0.1);
+  transform:translateY(-3px);
+}
+.footer-socials a span{font-size:20px;color:var(--text-dim)}
+.footer-socials a:hover span{color:var(--accent)}
+
+@media(max-width:600px){
+  .header{padding:0 16px}
+  .search-wrap{width:160px}
+  .hero h1{font-size:2rem}
+  .cards-grid{padding:0 16px 60px}
+  .card{padding:20px;gap:14px}
+  .card-icon-wrap{width:42px;height:42px}
+  .card-icon-wrap span{font-size:20px}
+}
+
+.card:nth-child(1){animation-delay:0.05s}
+.card:nth-child(2){animation-delay:0.12s}
+.card:nth-child(3){animation-delay:0.19s}
+.card:nth-child(4){animation-delay:0.26s}
+.card:nth-child(5){animation-delay:0.33s}
+</style>
+</head>
+
+<body>
+
+<canvas id="particles-canvas"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header class="header">
+  <div class="logo" onclick="window.location.href='index.html'">
+    <div class="logo-icon"><span class="material-symbols-rounded">shield</span></div>
+    <span class="logo-text">Digital Diary</span>
+  </div>
+
+  <div class="header-actions">
+    <div class="search-wrap">
+      <span class="material-symbols-rounded search-icon">search</span>
+      <input type="text" id="searchInput" placeholder="Search...">
+    </div>
+    <button class="icon-btn" onclick="toggleMusic()" title="Toggle Music">
+      <span class="material-symbols-rounded" id="musicIcon">music_note</span>
+    </button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>MonaDump</h1>
+  <p class="tagline">A place where i write blogs</p>
+</section>
+
+<div class="controls">
+  <div class="sort-wrap">
+    <label>Sort by:</label>
+    <select id="sortSelect">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="az">A-Z</option>
+      <option value="za">Z-A</option>
+    </select>
+  </div>
+</div>
+
+<div class="cards-grid" id="cardsGrid"></div>
+
+<footer class="footer">
+  <div class="footer-socials">
+    <a href="https://github.com/MeowDump" target="_blank" title="GitHub">
+      <span class="material-symbols-rounded">code</span>
+    </a>
+    <a href="https://t.me/MeowDump" target="_blank" title="Telegram">
+      <span class="material-symbols-rounded">send</span>
+    </a>
+    <a href="https://t.me/IntegrityBox" target="_blank" title="Integrity Box Channel">
+      <span class="material-symbols-rounded">groups</span>
+    </a>
+  </div>
+  Authored by <a href="https://t.me/MeowDump" target="_blank">𝗠𝗘𝗢𝗪𝗻𝗮 💅</a> · <span id="footerDate"></span>
+</footer>
+
+<audio id="bg-music" src="music.mp3" loop></audio>
+
+<script>
+const resources = [
+  {
+    id:1,
+    title:"Soul",
+    desc:"A poem written be me",
+    icon:"public",
+    author:"𝗠𝗘𝗢𝗪𝗻𝗮 💅",
+    date:"2026-03-16",
+    link:"soul.html"
+  },
+  {
+    id:2,
+    title:"The Invisible Eye",
+    desc:"Privacy does not exist in 2026",
+    icon:"air",
+    author:"𝗠𝗘𝗢𝗪𝗻𝗮 💅",
+    date:"2026-04-30",
+    link:"osint.html"
+  }
+];
+
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle{
+  constructor(){
+    this.x = Math.random()*canvas.width;
+    this.y = Math.random()*canvas.height;
+    this.size = Math.random()*2+0.5;
+    this.speedX = (Math.random()-0.5)*0.4;
+    this.speedY = (Math.random()-0.5)*0.4;
+    this.opacity = Math.random()*0.4+0.15;
+  }
+  update(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if(this.x<0||this.x>canvas.width) this.speedX*=-1;
+    if(this.y<0||this.y>canvas.height) this.speedY*=-1;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle = `rgba(77,163,255,${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+for(let i=0;i<60;i++) particles.push(new Particle());
+
+function animateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx = particles[i].x-particles[j].x;
+      const dy = particles[i].y-particles[j].y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist<130){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle = `rgba(77,163,255,${0.08*(1-dist/130)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+function formatDate(dateStr){
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now-d)/(1000*60*60*24));
+  if(diff===0) return "Today";
+  if(diff===1) return "Yesterday";
+  if(diff<7) return `${diff} days ago`;
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function renderCards(data){
+  const grid = document.getElementById('cardsGrid');
+  if(data.length===0){
+    grid.innerHTML = `<div class="no-results">
+      <span class="material-symbols-rounded">search_off</span>
+      <h3>No results found</h3>
+      <p>Try adjusting your search or filters</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = data.map((item,i)=>`
+    <a href="${item.link}" class="card" style="animation-delay:${i*0.07}s">
+      <div class="card-icon-wrap"><span class="material-symbols-rounded">${item.icon}</span></div>
+      <div class="card-body">
+        <h2>${item.title}</h2>
+        <p>${item.desc}</p>
+        <div class="card-meta-row">
+          <div class="card-meta-item">
+            <span class="material-symbols-rounded">person</span>
+            ${item.author}
+          </div>
+          <div class="card-meta-item">
+            <span class="material-symbols-rounded">calendar_today</span>
+            ${formatDate(item.date)}
+          </div>
+        </div>
+      </div>
+      <span class="material-symbols-rounded card-arrow">arrow_forward</span>
+    </a>
+  `).join('');
+}
+
+let currentSort = 'newest';
+let searchQuery = '';
+
+function filterAndSort(){
+  let result = [...resources];
+  if(searchQuery){
+    const q = searchQuery.toLowerCase();
+    result = result.filter(r=>
+      r.title.toLowerCase().includes(q)||
+      r.desc.toLowerCase().includes(q)||
+      r.author.toLowerCase().includes(q)
+    );
+  }
+  result.sort((a,b)=>{
+    switch(currentSort){
+      case 'newest': return new Date(b.date)-new Date(a.date);
+      case 'oldest': return new Date(a.date)-new Date(b.date);
+      case 'az': return a.title.localeCompare(b.title);
+      case 'za': return b.title.localeCompare(a.title);
+      default: return 0;
+    }
+  });
+  renderCards(result);
+}
+
+document.getElementById('sortSelect').addEventListener('change',(e)=>{
+  currentSort = e.target.value;
+  filterAndSort();
+});
+
+document.getElementById('searchInput').addEventListener('input',(e)=>{
+  searchQuery = e.target.value.trim();
+  filterAndSort();
+});
+
+const music = document.getElementById('bg-music');
+const musicIcon = document.getElementById('musicIcon');
+let musicStarted = false;
+
+function toggleMusic(){
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted = true;
+    musicIcon.textContent = 'music_note';
+    return;
+  }
+  if(music.paused){
+    music.play();
+    musicIcon.textContent = 'music_note';
+  } else {
+    music.pause();
+    musicIcon.textContent = 'music_off';
+  }
+}
+
+document.addEventListener('click',function startMusicOnce(){
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted = true;
+  }
+  document.removeEventListener('click',startMusicOnce);
+  document.removeEventListener('keydown',startMusicOnce);
+});
+document.addEventListener('keydown',function startMusicOnce(){
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted = true;
+  }
+  document.removeEventListener('click',startMusicOnce);
+  document.removeEventListener('keydown',startMusicOnce);
+});
+
+document.addEventListener('click',e=>{
+  const link = e.target.closest('a');
+  if(link && link.href && link.getAttribute('href').startsWith('http') && !link.href.includes(window.location.hostname)){
+    e.preventDefault();
+    window.open(link.href,'_blank','noopener');
+  }
+});
+
+document.getElementById('footerDate').textContent = new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
+
+filterAndSort();
+</script>
+
+</body>
+</html>
