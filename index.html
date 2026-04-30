@@ -166,6 +166,34 @@ body{
 }
 .icon-btn span{font-size:20px}
 
+.view {
+  display: none;
+  position: relative;
+  z-index: 1;
+}
+.view.active {
+  display: block;
+}
+
+.iframe-wrap {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: none;
+}
+.iframe-wrap.active {
+  display: block;
+}
+.iframe-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--bg);
+}
+
 .hero{
   position:relative;
   z-index:1;
@@ -384,6 +412,29 @@ body{
 .footer-socials a span{font-size:20px;color:var(--text-dim)}
 .footer-socials a:hover span{color:var(--accent)}
 
+.back-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(28,28,30,0.8);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-right: 10px;
+}
+.back-btn:hover {
+  border-color: var(--accent);
+  background: rgba(77,163,255,0.1);
+}
+.back-btn.active {
+  display: flex;
+}
+
 @media(max-width:600px){
   .header{padding:0 16px}
   .search-wrap{width:160px}
@@ -409,13 +460,17 @@ body{
 <div class="orb orb-2"></div>
 
 <header class="header">
-  <div class="logo" onclick="window.location.href='index.html'">
+  <div class="logo" onclick="goHome()">
     <div class="logo-icon"><span class="material-symbols-rounded">shield</span></div>
     <span class="logo-text">Digital Diary</span>
   </div>
 
   <div class="header-actions">
-    <div class="search-wrap">
+    <button class="back-btn" id="backBtn" onclick="goHome()">
+      <span class="material-symbols-rounded">arrow_back</span>
+      Back
+    </button>
+    <div class="search-wrap" id="searchWrap">
       <span class="material-symbols-rounded search-icon">search</span>
       <input type="text" id="searchInput" placeholder="Search...">
     </div>
@@ -425,39 +480,45 @@ body{
   </div>
 </header>
 
-<section class="hero">
-  <h1>MonaDump</h1>
-  <p class="tagline">A place where i write blogs</p>
-</section>
+<div class="view active" id="homeView">
+  <section class="hero">
+    <h1>MonaDump</h1>
+    <p class="tagline">A place where i write blogs</p>
+  </section>
 
-<div class="controls">
-  <div class="sort-wrap">
-    <label>Sort by:</label>
-    <select id="sortSelect">
-      <option value="newest">Newest First</option>
-      <option value="oldest">Oldest First</option>
-      <option value="az">A-Z</option>
-      <option value="za">Z-A</option>
-    </select>
+  <div class="controls">
+    <div class="sort-wrap">
+      <label>Sort by:</label>
+      <select id="sortSelect">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="az">A-Z</option>
+        <option value="za">Z-A</option>
+      </select>
+    </div>
   </div>
+
+  <div class="cards-grid" id="cardsGrid"></div>
+
+  <footer class="footer">
+    <div class="footer-socials">
+      <a href="https://github.com/MeowDump" target="_blank" title="GitHub">
+        <span class="material-symbols-rounded">code</span>
+      </a>
+      <a href="https://t.me/MeowDump" target="_blank" title="Telegram">
+        <span class="material-symbols-rounded">send</span>
+      </a>
+      <a href="https://t.me/IntegrityBox" target="_blank" title="Integrity Box Channel">
+        <span class="material-symbols-rounded">groups</span>
+      </a>
+    </div>
+    Authored by <a href="https://t.me/MeowDump" target="_blank">𝗠𝗘𝗢𝗪𝗻𝗮 💅</a> · <span id="footerDate"></span>
+  </footer>
 </div>
 
-<div class="cards-grid" id="cardsGrid"></div>
-
-<footer class="footer">
-  <div class="footer-socials">
-    <a href="https://github.com/MeowDump" target="_blank" title="GitHub">
-      <span class="material-symbols-rounded">code</span>
-    </a>
-    <a href="https://t.me/MeowDump" target="_blank" title="Telegram">
-      <span class="material-symbols-rounded">send</span>
-    </a>
-    <a href="https://t.me/IntegrityBox" target="_blank" title="Integrity Box Channel">
-      <span class="material-symbols-rounded">groups</span>
-    </a>
-  </div>
-  Authored by <a href="https://t.me/MeowDump" target="_blank">𝗠𝗘𝗢𝗪𝗻𝗮 💅</a> · <span id="footerDate"></span>
-</footer>
+<div class="iframe-wrap" id="iframeView">
+  <iframe id="pageFrame" src=""></iframe>
+</div>
 
 <audio id="bg-music" src="music.mp3" loop></audio>
 
@@ -470,7 +531,7 @@ const resources = [
     icon:"public",
     author:"𝗠𝗘𝗢𝗪𝗻𝗮 💅",
     date:"2026-03-16",
-    link:"soul.html"
+    link:"poem.html"
   },
   {
     id:2,
@@ -562,7 +623,7 @@ function renderCards(data){
     return;
   }
   grid.innerHTML = data.map((item,i)=>`
-    <a href="${item.link}" class="card" style="animation-delay:${i*0.07}s">
+    <div class="card" style="animation-delay:${i*0.07}s" onclick="openPage('${item.link}')">
       <div class="card-icon-wrap"><span class="material-symbols-rounded">${item.icon}</span></div>
       <div class="card-body">
         <h2>${item.title}</h2>
@@ -579,7 +640,7 @@ function renderCards(data){
         </div>
       </div>
       <span class="material-symbols-rounded card-arrow">arrow_forward</span>
-    </a>
+    </div>
   `).join('');
 }
 
@@ -616,6 +677,30 @@ document.getElementById('sortSelect').addEventListener('change',(e)=>{
 document.getElementById('searchInput').addEventListener('input',(e)=>{
   searchQuery = e.target.value.trim();
   filterAndSort();
+});
+
+function openPage(url) {
+  document.getElementById('homeView').classList.remove('active');
+  document.getElementById('iframeView').classList.add('active');
+  document.getElementById('pageFrame').src = url;
+  document.getElementById('backBtn').classList.add('active');
+  document.getElementById('searchWrap').style.display = 'none';
+  history.pushState({page: url}, '', '#' + url.replace('.html', ''));
+}
+
+function goHome() {
+  document.getElementById('iframeView').classList.remove('active');
+  document.getElementById('homeView').classList.add('active');
+  document.getElementById('pageFrame').src = '';
+  document.getElementById('backBtn').classList.remove('active');
+  document.getElementById('searchWrap').style.display = 'block';
+  history.pushState({}, '', window.location.pathname);
+}
+
+window.addEventListener('popstate', (e) => {
+  if (!e.state || !e.state.page) {
+    goHome();
+  }
 });
 
 const music = document.getElementById('bg-music');
